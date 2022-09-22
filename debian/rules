@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+
+NULL =
+
+VERSION = $(shell head -n1 debian/changelog | sed -e 's/.*(//;s/-.*).*//')
+
+include /usr/share/dpkg/architecture.mk
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+%:
+	dh $@ $(EXTRA_DH_ARG)
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -f rfb/rfbconfig.h
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+	    -DWITH_PNG=OFF \
+	    -DCMAKE_BUILD_TYPE=RELWITHDEBINFO \
+	    $(NULL)
+
+
+override_dh_strip:
+	dh_strip -plibvncclient1 --dbgsym-migration='libvncclient1-dbg (<< 0.9.12-1~)'
+	dh_strip -plibvncserver1 --dbgsym-migration='libvncserver1-dbg (<< 0.9.12-1~)'
+
+get-orig-source:
+	uscan --noconf --force-download --rename --download-current-version --destdir=..

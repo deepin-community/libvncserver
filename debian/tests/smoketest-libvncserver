@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+cd "$AUTOPKGTEST_TMP"
+
+if [ -n "${DEB_HOST_GNU_TYPE:-}" ]; then
+    CROSS_COMPILE="$DEB_HOST_GNU_TYPE-"
+else
+    CROSS_COMPILE=
+fi
+
+cat > test.c << EOF
+#include <rfb/rfb.h>
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+        rfbScreenInfoPtr screen;
+        screen = rfbGetScreen(&argc,argv,800,600,8,3,1);
+        printf("Would listen to port %d\n", screen->port);
+        rfbScreenCleanup(screen);
+        return 0;
+}
+
+EOF
+${CROSS_COMPILE}gcc -Wall -o test test.c -lvncserver
+./test
+objdump -p test | grep "libvncserver"

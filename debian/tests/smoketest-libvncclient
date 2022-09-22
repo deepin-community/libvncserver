@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+cd "$AUTOPKGTEST_TMP"
+
+if [ -n "${DEB_HOST_GNU_TYPE:-}" ]; then
+    CROSS_COMPILE="$DEB_HOST_GNU_TYPE-"
+else
+    CROSS_COMPILE=
+fi
+
+cat > test.c << EOF
+#include <rfb/rfbclient.h>
+
+int main(int argc, char *argv[])
+{
+        rfbClient *client;
+        client = rfbGetClient(8, 3, 4);
+        rfbClientCleanup(client);
+        return 0;
+}
+
+EOF
+${CROSS_COMPILE}gcc -Wall -o test test.c -lvncclient
+./test
+objdump -p test | grep "libvncclient"

@@ -1,0 +1,7 @@
+Name: libvncserver
+Bug-Database: https://github.com/LibVNC/libvncserver/issues
+Bug-Submit: https://github.com/LibVNC/libvncserver/issues/new
+Contact: Christian Beier <dontmind@freeshell.org>
+Repository: https://github.com/LibVNC/libvncserver
+Repository-Browse: https://github.com/LibVNC/libvncserver
+Security-Contact: Christian Beier <dontmind@freeshell.org>

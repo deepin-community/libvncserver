@@ -1,0 +1,3 @@
+0001-libvncserver-don-t-NULL-out-internal-of-the-default-.patch
+0002-zlib-Clear-buffer-pointers-on-cleanup.patch
+add-sunway-support.patch

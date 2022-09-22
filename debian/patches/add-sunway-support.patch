@@ -1,0 +1,84 @@
+Description: add sunway support
+Author: Miao Changwei <miaochangwei@uniontech.com>
+
+---
+Last-Update: 2022-05-19
+
+--- libvncserver-0.9.13+dfsg.orig/common/lzodefs.h
++++ libvncserver-0.9.13+dfsg/common/lzodefs.h
+@@ -900,6 +900,9 @@
+ #    define LZO_ARCH_CRAY_XMP       1
+ #    define LZO_INFO_ARCH           "cray_xmp"
+ #  endif
++#elif defined(__sw_64__) || defined(__sw_64)
++#  define LZO_ARCH_SW64             1
++#  define LZO_INFO_ARCH             "sw64"
+ #else
+ #  define LZO_ARCH_UNKNOWN          1
+ #  define LZO_INFO_ARCH             "unknown"
+@@ -2180,6 +2183,8 @@ LZO_COMPILE_TIME_ASSERT_HEADER(LZO_SIZEO
+ #  define LZO_WORDSIZE              8
+ #elif (defined(__vms) || defined(__VMS)) && (__INITIAL_POINTER_SIZE+0 == 64)
+ #  define LZO_WORDSIZE              8
++#elif (LZO_ARCH_SW64)
++#  define LZO_WORDSIZE              8
+ #endif
+ #endif
+ #if !defined(LZO_SIZEOF_VOID_P)
+@@ -2296,7 +2301,7 @@ LZO_COMPILE_TIME_ASSERT_HEADER(LZO_SIZEO
+ #  define LZO_ABI_BIG_ENDIAN        1
+ #elif (LZO_ARCH_IA64) && (LZO_OS_POSIX_LINUX || LZO_OS_WIN64)
+ #  define LZO_ABI_LITTLE_ENDIAN     1
+-#elif (LZO_ARCH_ALPHA || LZO_ARCH_AMD64 || LZO_ARCH_BLACKFIN || LZO_ARCH_CRIS || LZO_ARCH_I086 || LZO_ARCH_I386 || LZO_ARCH_MSP430)
++#elif (LZO_ARCH_ALPHA || LZO_ARCH_AMD64 || LZO_ARCH_BLACKFIN || LZO_ARCH_CRIS || LZO_ARCH_I086 || LZO_ARCH_I386 || LZO_ARCH_MSP430 || LZO_ARCH_SW64)
+ #  define LZO_ABI_LITTLE_ENDIAN     1
+ #elif (LZO_ARCH_AVR32 || LZO_ARCH_M68K || LZO_ARCH_S390 || LZO_ARCH_SPU)
+ #  define LZO_ABI_BIG_ENDIAN        1
+@@ -2548,6 +2553,8 @@ LZO_COMPILE_TIME_ASSERT_HEADER(LZO_SIZEO
+ #elif (LZO_ARCH_SH)
+ #  define LZO_OPT_PREFER_POSTINC            1
+ #  define LZO_OPT_PREFER_PREDEC             1
++#if (LZO_ARCH_SW64)
++#  define LZO_OPT_AVOID_UINT_INDEX          1
+ #endif
+ #ifndef LZO_CFG_NO_INLINE_ASM
+ #if (LZO_ABI_NEUTRAL_ENDIAN) || (LZO_ARCH_GENERIC)
+--- libvncserver-0.9.13+dfsg.orig/common/minilzo.c
++++ libvncserver-0.9.13+dfsg/common/minilzo.c
+@@ -920,6 +920,9 @@
+ #    define LZO_ARCH_CRAY_XMP       1
+ #    define LZO_INFO_ARCH           "cray_xmp"
+ #  endif
++#elif defined(__sw_64__) || defined(__sw_64)
++#  define LZO_ARCH_SW64             1
++#  define LZO_INFO_ARCH             "sw64"
+ #else
+ #  define LZO_ARCH_UNKNOWN          1
+ #  define LZO_INFO_ARCH             "unknown"
+@@ -2200,6 +2203,8 @@ LZO_COMPILE_TIME_ASSERT_HEADER(LZO_SIZEO
+ #  define LZO_WORDSIZE              8
+ #elif (defined(__vms) || defined(__VMS)) && (__INITIAL_POINTER_SIZE+0 == 64)
+ #  define LZO_WORDSIZE              8
++#elif (LZO_ARCH_SW64)
++#  define LZO_WORDSIZE              8
+ #endif
+ #endif
+ #if !defined(LZO_SIZEOF_VOID_P)
+@@ -2316,7 +2321,7 @@ LZO_COMPILE_TIME_ASSERT_HEADER(LZO_SIZEO
+ #  define LZO_ABI_BIG_ENDIAN        1
+ #elif (LZO_ARCH_IA64) && (LZO_OS_POSIX_LINUX || LZO_OS_WIN64)
+ #  define LZO_ABI_LITTLE_ENDIAN     1
+-#elif (LZO_ARCH_ALPHA || LZO_ARCH_AMD64 || LZO_ARCH_BLACKFIN || LZO_ARCH_CRIS || LZO_ARCH_I086 || LZO_ARCH_I386 || LZO_ARCH_MSP430)
++#elif (LZO_ARCH_ALPHA || LZO_ARCH_AMD64 || LZO_ARCH_BLACKFIN || LZO_ARCH_CRIS || LZO_ARCH_I086 || LZO_ARCH_I386 || LZO_ARCH_MSP430 || LZO_ARCH_SW64)
+ #  define LZO_ABI_LITTLE_ENDIAN     1
+ #elif (LZO_ARCH_AVR32 || LZO_ARCH_M68K || LZO_ARCH_S390 || LZO_ARCH_SPU)
+ #  define LZO_ABI_BIG_ENDIAN        1
+@@ -2568,6 +2573,8 @@ LZO_COMPILE_TIME_ASSERT_HEADER(LZO_SIZEO
+ #elif (LZO_ARCH_SH)
+ #  define LZO_OPT_PREFER_POSTINC            1
+ #  define LZO_OPT_PREFER_PREDEC             1
++#if (LZO_ARCH_SW64)
++#  define LZO_OPT_AVOID_UINT_INDEX          1
+ #endif
+ #ifndef LZO_CFG_NO_INLINE_ASM
+ #if (LZO_ABI_NEUTRAL_ENDIAN) || (LZO_ARCH_GENERIC)

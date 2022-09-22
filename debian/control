@@ -1,0 +1,69 @@
+Source: libvncserver
+Section: libs
+Priority: optional
+Maintainer: Debian Remote Maintainers <debian-remote@lists.debian.org>
+Uploaders:
+ Mike Gabriel <sunweaver@debian.org>,
+Build-Depends: cmake (>= 3.4),
+               debhelper-compat (= 13),
+               libgnutls28-dev,
+               libjpeg-dev,
+               liblzo2-dev,
+               pkg-config,
+               libgcrypt20-dev,
+               libsasl2-dev,
+               zlib1g-dev
+Standards-Version: 4.5.1
+Rules-Requires-Root: no
+Homepage: http://libvnc.github.io
+Vcs-Git: https://salsa.debian.org/debian-remote-team/libvncserver.git
+Vcs-Browser: https://salsa.debian.org/debian-remote-team/libvncserver/
+
+Package: libvncclient1
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Breaks: libvncserver0 (<< 0.9.9+dfsg-3)
+Replaces: libvncserver0 (<< 0.9.9+dfsg-3)
+Multi-Arch: same
+Description: API to write one's own VNC server - client library
+ LibVNCServer makes writing a VNC server (or more correctly, a program
+ exporting a framebuffer via the Remote Frame Buffer protocol) easy. It hides
+ the programmer from the tedious task of managing clients and compression.
+ .
+ This package provides the client library.
+
+Package: libvncserver1
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Multi-Arch: same
+Description: API to write one's own VNC server
+ LibVNCServer makes writing a VNC server (or more correctly, a program
+ exporting a framebuffer via the Remote Frame Buffer protocol) easy. It hides
+ the programmer from the tedious task of managing clients and compression.
+ .
+ This package provides the server library.
+
+Package: libvncserver-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         libvncclient1 (= ${binary:Version}),
+         libvncserver1 (= ${binary:Version}),
+         libgcrypt20-dev,
+         libgnutls28-dev,
+         libjpeg-dev,
+         liblzo2-dev,
+         libsasl2-dev,
+         zlib1g-dev,
+Multi-Arch: same
+Description: API to write one's own VNC server - development files
+ LibVNCServer makes writing a VNC server (or more correctly, a program
+ exporting a framebuffer via the Remote Frame Buffer protocol) easy. It hides
+ the programmer from the tedious task of managing clients and compression.
+ .
+ This is the development package which contains headers and static libraries
+ for libvncserver.

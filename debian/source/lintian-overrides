@@ -1,0 +1,4 @@
+# for libvncserver, the dbgsym migration has only been started during the
+# bullseye (Debian 11) release cycle. Can be removed in bullseye+1, at the
+# earliest.
+libvncserver source: debug-symbol-migration-possibly-complete

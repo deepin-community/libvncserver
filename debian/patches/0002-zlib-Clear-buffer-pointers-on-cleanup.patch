@@ -1,0 +1,49 @@
+From 1e0538a1a1eade3eaae24c7b2b778f09e503b3ac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Wed, 16 Sep 2020 08:38:05 +0200
+Subject: [PATCH 2/2] zlib: Clear buffer pointers on cleanup
+
+The pointers to the buffers were freed, and the size fields were set to
+0, but the buffer pointers themsef was not set to NULL, when shutting
+down, meaning the next time used, NULL checks would not tell whether the
+pointer is valid. This caused crashes ending with
+
+  #0  0x00007ffff73729e5 in raise () from /lib64/libc.so.6
+  #1  0x00007ffff735b895 in abort () from /lib64/libc.so.6
+  #2  0x00007ffff73b6857 in __libc_message () from /lib64/libc.so.6
+  #3  0x00007ffff73bdd7c in malloc_printerr () from /lib64/libc.so.6
+  #4  0x00007ffff73c2f1a in realloc () from /lib64/libc.so.6
+  #5  0x00007ffff78b558e in rfbSendOneRectEncodingZlib (cl=0x4a4b80, x=0, y=0, w=800, h=40) at /home/jonas/Dev/gnome/libvncserver/libvncserver/zlib.c:106
+  #6  0x00007ffff78b5dec in rfbSendRectEncodingZlib (cl=0x4a4b80, x=0, y=0, w=800, h=600) at /home/jonas/Dev/gnome/libvncserver/libvncserver/zlib.c:308
+  #7  0x00007ffff7899453 in rfbSendFramebufferUpdate (cl=0x4a4b80, givenUpdateRegion=0x49ef70) at /home/jonas/Dev/gnome/libvncserver/libvncserver/rfbserver.c:3264
+  #8  0x00007ffff789079d in rfbUpdateClient (cl=0x4a4b80) at /home/jonas/Dev/gnome/libvncserver/libvncserver/main.c:1275
+  #9  0x00007ffff78905f5 in rfbProcessEvents (screen=0x4d5790, usec=0) at /home/jonas/Dev/gnome/libvncserver/libvncserver/main.c:1251
+
+Origin: https://github.com/LibVNC/libvncserver/commit/91c685ca
+Bug-GNOME: https://gitlab.gnome.org/GNOME/gnome-remote-desktop/-/issues/45
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/libvncserver/+bug/1915410
+---
+ libvncserver/zlib.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libvncserver/zlib.c b/libvncserver/zlib.c
+index ac20c9c..6b7731e 100644
+--- a/libvncserver/zlib.c
++++ b/libvncserver/zlib.c
+@@ -63,11 +63,13 @@ void rfbZlibCleanup(rfbScreenInfoPtr screen)
+ {
+   if (zlibBeforeBufSize) {
+     free(zlibBeforeBuf);
++    zlibBeforeBuf = NULL;
+     zlibBeforeBufSize=0;
+   }
+   if (zlibAfterBufSize) {
+     zlibAfterBufSize=0;
+     free(zlibAfterBuf);
++    zlibAfterBuf = NULL;
+   }
+ }
+ 
+-- 
+2.25.1
+
