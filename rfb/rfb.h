@@ -104,6 +104,9 @@ typedef void (*rfbKbdAddEventProcPtr) (rfbBool down, rfbKeySym keySym, struct _r
 typedef void (*rfbKbdReleaseAllKeysProcPtr) (struct _rfbClientRec* cl);
 typedef void (*rfbPtrAddEventProcPtr) (int buttonMask, int x, int y, struct _rfbClientRec* cl);
 typedef void (*rfbSetXCutTextProcPtr) (char* str,int len, struct _rfbClientRec* cl);
+#ifdef LIBVNCSERVER_HAVE_LIBZ
+typedef void (*rfbSetXCutTextUTF8ProcPtr) (char* str,int len, struct _rfbClientRec* cl);
+#endif
 typedef struct rfbCursor* (*rfbGetCursorProcPtr) (struct _rfbClientRec* pScreen);
 typedef rfbBool (*rfbSetTranslateFunctionProcPtr)(struct _rfbClientRec* cl);
 typedef rfbBool (*rfbPasswordCheckProcPtr)(struct _rfbClientRec* cl,const char* encryptedPassWord,int len);
@@ -360,7 +363,15 @@ typedef struct _rfbScreenInfo
 	of file descriptors LibVNCServer uses before denying new client connections.
 	It is set to 0.5 per default. */
     float fdQuota;
-
+#ifdef LIBVNCSERVER_HAVE_LIBPTHREAD
+    pthread_t listener_thread;
+    int pipe_notify_listener_thread[2];
+#elif defined(LIBVNCSERVER_HAVE_WIN32THREADS)
+    uintptr_t listener_thread;
+#endif
+#ifdef LIBVNCSERVER_HAVE_LIBZ
+    rfbSetXCutTextUTF8ProcPtr setXCutTextUTF8;
+#endif
 } rfbScreenInfo, *rfbScreenInfoPtr;
 
 
@@ -480,7 +491,8 @@ typedef struct _rfbClientRec {
         /* Ephemeral internal-use states that will never be seen by software
          * using LibVNCServer to provide services: */
 
-        RFB_INITIALISATION_SHARED /**< sending initialisation messages with implicit shared-flag already true */
+        RFB_INITIALISATION_SHARED, /**< sending initialisation messages with implicit shared-flag already true */
+        RFB_SHUTDOWN            /**< Client is shutting down */
     } state;
 
     rfbBool reverseConnection;
@@ -555,7 +567,7 @@ typedef struct _rfbClientRec {
      * means 8K minimum.
      */
 
-#define UPDATE_BUF_SIZE 30000
+#define UPDATE_BUF_SIZE 32768
 
     char updateBuf[UPDATE_BUF_SIZE];
     int ublen;
@@ -680,6 +692,21 @@ typedef struct _rfbClientRec {
     rfbBool useExtDesktopSize;
     int requestedDesktopSizeChange;
     int lastDesktopSizeChangeError;
+
+#ifdef LIBVNCSERVER_HAVE_LIBZ
+    rfbBool enableExtendedClipboard;
+    uint32_t extClipboardUserCap;
+    uint32_t extClipboardMaxUnsolicitedSize;
+    char *extClipboardData;
+    int extClipboardDataSize;
+
+#ifdef LIBVNCSERVER_HAVE_LIBJPEG
+    /* Tight encoding internal variables, stored per-client for thread safety */
+    rfbBool tightUsePixelFormat24;
+    void *tightTJ;
+    int tightPngDstDataLen;
+#endif
+#endif
 } rfbClientRec, *rfbClientPtr;
 
 /**
@@ -779,6 +806,9 @@ extern rfbBool rfbSendFramebufferUpdate(rfbClientPtr cl, sraRegionPtr updateRegi
 extern rfbBool rfbSendRectEncodingRaw(rfbClientPtr cl, int x,int y,int w,int h);
 extern rfbBool rfbSendUpdateBuf(rfbClientPtr cl);
 extern void rfbSendServerCutText(rfbScreenInfoPtr rfbScreen,char *str, int len);
+#ifdef LIBVNCSERVER_HAVE_LIBZ
+extern void rfbSendServerCutTextUTF8(rfbScreenInfoPtr rfbScreen,char *str, int len, char *fallbackLatin1Str, int latin1Len);
+#endif
 extern rfbBool rfbSendCopyRegion(rfbClientPtr cl,sraRegionPtr reg,int dx,int dy);
 extern rfbBool rfbSendLastRectMarker(rfbClientPtr cl);
 extern rfbBool rfbSendNewFBSize(rfbClientPtr cl, int w, int h);
@@ -874,8 +904,6 @@ extern rfbBool rfbSendRectEncodingZlib(rfbClientPtr cl, int x, int y, int w,
 
 #define TIGHT_DEFAULT_COMPRESSION  6
 #define TURBO_DEFAULT_SUBSAMP 0
-
-extern rfbBool rfbTightDisableGradient;
 
 extern int rfbNumCodedRectsTight(rfbClientPtr cl, int x,int y,int w,int h);
 
@@ -1004,8 +1032,8 @@ void rfbDoNothingWithClient(rfbClientPtr cl);
 enum rfbNewClientAction defaultNewClientHook(rfbClientPtr cl);
 void rfbRegisterProtocolExtension(rfbProtocolExtension* extension);
 void rfbUnregisterProtocolExtension(rfbProtocolExtension* extension);
-struct _rfbProtocolExtension* rfbGetExtensionIterator();
-void rfbReleaseExtensionIterator();
+struct _rfbProtocolExtension* rfbGetExtensionIterator(void);
+void rfbReleaseExtensionIterator(void);
 rfbBool rfbEnableExtension(rfbClientPtr cl, rfbProtocolExtension* extension,
 	void* data);
 rfbBool rfbDisableExtension(rfbClientPtr cl, rfbProtocolExtension* extension);
@@ -1043,9 +1071,16 @@ extern void rfbRunEventLoop(rfbScreenInfoPtr screenInfo, long usec, rfbBool runI
 extern rfbBool rfbProcessEvents(rfbScreenInfoPtr screenInfo,long usec);
 extern rfbBool rfbIsActive(rfbScreenInfoPtr screenInfo);
 
-/* TightVNC file transfer extension */
-void rfbRegisterTightVNCFileTransferExtension();
-void rfbUnregisterTightVNCFileTransferExtension();
+/**
+ * Register the TightVNC-1.3.x file transfer extension.
+ * NB That TightVNC-2.x uses a different, incompatible file transfer protocol.
+ */
+void rfbRegisterTightVNCFileTransferExtension(void);
+/**
+ * Unregister the TightVNC-1.3.x file transfer extension.
+ * NB That TightVNC-2.x uses a different, incompatible file transfer protocol.
+ */
+void rfbUnregisterTightVNCFileTransferExtension(void);
 
 /* Statistics */
 extern char *messageNameServer2Client(uint32_t type, char *buf, int len);
@@ -1099,6 +1134,7 @@ rfbBool rfbUpdateClient(rfbClientPtr cl);
 
 /**
  @page libvncserver_doc LibVNCServer Documentation
+ @tableofcontents
  @section create_server Creating a server instance
  To make a server, you just have to initialise a server structure using the
  function rfbGetScreen(), like
@@ -1144,7 +1180,8 @@ rfbBool rfbUpdateClient(rfbClientPtr cl);
  This tells LibVNCServer to send updates to all connected clients.
 
  There exist the following IO functions as members of rfbScreen:
- rfbScreenInfo::kbdAddEvent(), rfbScreenInfo::kbdReleaseAllKeys(), rfbScreenInfo::ptrAddEvent() and rfbScreenInfo::setXCutText()
+ rfbScreenInfo::kbdAddEvent(), rfbScreenInfo::kbdReleaseAllKeys(), rfbScreenInfo::ptrAddEvent(),
+ rfbScreenInfo::setXCutText() and rfbScreenInfo::setXCutTextUTF8()
 
  rfbScreenInfo::kbdAddEvent()
    is called when a key is pressed.
@@ -1157,6 +1194,8 @@ rfbBool rfbUpdateClient(rfbClientPtr cl);
    in your own function. This sets the coordinates of the cursor.
  rfbScreenInfo::setXCutText()
    is called when the selection changes.
+ rfbScreenInfo::setXCutTextUTF8()
+   is called when the selection changes and the ExtendedClipboard extension is enabled.
 
  There are only two hooks:
  rfbScreenInfo::newClientHook()

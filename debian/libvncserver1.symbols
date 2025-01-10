@@ -65,20 +65,20 @@ libvncserver.so.1 libvncserver1 #MINVER#
 #MISSING: 0.9.12# _lzo_config_check@Base 0.9.10
 #MISSING: 0.9.12# _lzo_version_date@Base 0.9.10
 #MISSING: 0.9.12# _lzo_version_string@Base 0.9.10
- decrypt_rfbdes@Base 0.9.13+dfsg
- dh_compute_shared_key@Base 0.9.13+dfsg
- dh_generate_keypair@Base 0.9.13+dfsg
-#MISSING: 0.9.13+dfsg# digestmd5@Base 0.9.10
-#MISSING: 0.9.13+dfsg# digestsha1@Base 0.9.10
+ decrypt_rfbdes@Base 0.9.13
+ dh_compute_shared_key@Base 0.9.13
+ dh_generate_keypair@Base 0.9.13
+#MISSING: 0.9.13# digestmd5@Base 0.9.10
+#MISSING: 0.9.13# digestsha1@Base 0.9.10
  encodingName@Base 0.9.10
- encrypt_aes128ecb@Base 0.9.13+dfsg
- encrypt_rfbdes@Base 0.9.13+dfsg
-#MISSING: 0.9.13+dfsg# fileDownloadMutex@Base 0.9.10
-#MISSING: 0.9.13+dfsg# fileTransferEnabled@Base 0.9.10
-#MISSING: 0.9.13+dfsg# fileTransferInitted@Base 0.9.10
-#MISSING: 0.9.13+dfsg# ftproot@Base 0.9.10
- hash_md5@Base 0.9.13+dfsg
- hash_sha1@Base 0.9.13+dfsg
+ encrypt_aes128ecb@Base 0.9.13
+ encrypt_rfbdes@Base 0.9.13
+#MISSING: 0.9.13# fileDownloadMutex@Base 0.9.10
+#MISSING: 0.9.13# fileTransferEnabled@Base 0.9.10
+#MISSING: 0.9.13# fileTransferInitted@Base 0.9.10
+#MISSING: 0.9.13# ftproot@Base 0.9.10
+ hash_md5@Base 0.9.13
+ hash_sha1@Base 0.9.13
  hybiDecodeCleanupComplete@Base 0.9.12
 #MISSING: 0.9.12# lzo1x_1_compress@Base 0.9.10
 #MISSING: 0.9.12# lzo1x_decompress@Base 0.9.10
@@ -94,7 +94,7 @@ libvncserver.so.1 libvncserver1 #MINVER#
 #MISSING: 0.9.12# lzo_version_string@Base 0.9.10
  messageNameClient2Server@Base 0.9.10
  messageNameServer2Client@Base 0.9.10
- random_bytes@Base 0.9.13+dfsg
+ random_bytes@Base 0.9.13
  rfbAuthNewClient@Base 0.9.10
  rfbAuthProcessClientMessage@Base 0.9.10
 #MISSING: 0.9.12# rfbCPKey@Base 0.9.10
@@ -113,8 +113,8 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbDecrClientRef@Base 0.9.10
  rfbDecryptPasswdFromFile@Base 0.9.10
  rfbDefaultPtrAddEvent@Base 0.9.10
-#MISSING: 0.9.13+dfsg# rfbDes@Base 0.9.10
-#MISSING: 0.9.13+dfsg# rfbDesKey@Base 0.9.10
+#MISSING: 0.9.13# rfbDes@Base 0.9.10
+#MISSING: 0.9.13# rfbDesKey@Base 0.9.10
  rfbDisableExtension@Base 0.9.10
  rfbDisconnectUDPSock@Base 0.9.10
  rfbDoCopyRect@Base 0.9.10
@@ -139,6 +139,7 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbFontBBox@Base 0.9.10
  rfbFreeCursor@Base 0.9.10
  rfbFreeFont@Base 0.9.10
+ rfbFreeTightData@Base 0.9.14
  rfbFreeUltraData@Base 0.9.10
  rfbFreeZrleData@Base 0.9.10
  rfbGetClientIterator@Base 0.9.10
@@ -222,7 +223,7 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbSendCursorPos@Base 0.9.10
  rfbSendCursorShape@Base 0.9.10
  rfbSendDirContent@Base 0.9.10
- rfbSendExtDesktopSize@Base 0.9.13+dfsg
+ rfbSendExtDesktopSize@Base 0.9.13
  rfbSendFileTransferChunk@Base 0.9.10
  rfbSendFileTransferMessage@Base 0.9.10
  rfbSendFramebufferUpdate@Base 0.9.10
@@ -241,6 +242,7 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbSendRectEncodingZRLE@Base 0.9.10
  rfbSendRectEncodingZlib@Base 0.9.10
  rfbSendServerCutText@Base 0.9.10
+ rfbSendServerCutTextUTF8@Base 0.9.14
  rfbSendServerIdentity@Base 0.9.10
  rfbSendSetColourMapEntries@Base 0.9.10
  rfbSendSupportedEncodings@Base 0.9.10
@@ -276,7 +278,7 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbStatRecordMessageRcvd@Base 0.9.10
  rfbStatRecordMessageSent@Base 0.9.10
  rfbStringToAddr@Base 0.9.10
- rfbTightCleanup@Base 0.9.10
+#MISSING: 0.9.14# rfbTightCleanup@Base 0.9.10
  rfbTightExtensionClientClose@Base 0.9.10
  rfbTightExtensionInit@Base 0.9.10
  rfbTightExtensionMsgHandler@Base 0.9.10
@@ -288,12 +290,12 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbUnregisterTightVNCFileTransferExtension@Base 0.9.10
  rfbUpdateClient@Base 0.9.10
  rfbUsage@Base 0.9.10
-#MISSING: 0.9.13+dfsg# rfbUseKey@Base 0.9.10
+#MISSING: 0.9.13# rfbUseKey@Base 0.9.10
  rfbWholeFontBBox@Base 0.9.10
  rfbWidthOfChar@Base 0.9.10
  rfbWidthOfString@Base 0.9.10
  rfbWriteExact@Base 0.9.10
- rfbZlibCleanup@Base 0.9.10
+#MISSING: 0.9.14# rfbZlibCleanup@Base 0.9.10
  rfbssl_destroy@Base 0.9.10
  rfbssl_init@Base 0.9.10
  rfbssl_init_global@Base 0.9.10
@@ -302,6 +304,8 @@ libvncserver.so.1 libvncserver1 #MINVER#
  rfbssl_pending@Base 0.9.10
  rfbssl_read@Base 0.9.10
  rfbssl_write@Base 0.9.10
+ sock_set_nonblocking@Base 0.9.14
+ sock_wait_for_connected@Base 0.9.14
  sraClipRect2@Base 0.9.10
  sraClipRect@Base 0.9.10
  sraRgnAnd@Base 0.9.10

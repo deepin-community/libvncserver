@@ -1,14 +1,44 @@
-libvncserver (0.9.13+dfsg.1-1+dde) UNRELEASED; urgency=medium
+libvncserver (0.9.14+dfsg-1) unstable; urgency=medium
 
-  * update
+  * New upstream release.
+  * debian/control:
+    + Bump Standards-Version: to 4.6.2. No changes needed.
+  * debian/patches:
+    + Drop all patches. All included in this upstream release.
+  * debian/libvncserver-dev.install:
+    + Add CMake module for LibVNCServer.
+  * debian/*.symbols:
+    + Update symbols for 0.9.14.
+  * debian/{rules,source/lintian-overrides}:
+    + Drop finished dbgsym-migration specific rules.
+  * debian/copyright:
+    + Update copyright attributions.
 
- -- Debian Remote Maintainers <debian-remote@lists.debian.org>  Tue, 26 Jul 2022 11:23:26 +0800
+ -- Mike Gabriel <sunweaver@debian.org>  Mon, 06 Feb 2023 17:38:46 +0100
 
-libvncserver (0.9.13+dfsg.1-1+dde) unstable; urgency=medium
+libvncserver (0.9.13+dfsg-5) unstable; urgency=medium
 
-  * Add sunway support.
+  [ Thosten Alteholz ]
+  * debian/patches:
+    + CVE-2020-29260: Add CVE-2020-29260.patch. Resolve memory leak in
+      function rfbClientCleanup(). (Closes: #1019228).
 
- -- Miao Changwei <miaochangwei@uniontech.com>  Fri, 20 May 2022 00:17:46 +0800
+  [ Mike Gabriel ]
+  * debian/watch:
+    + Use tags-path on Github, not releases-path.
+
+ -- Mike Gabriel <sunweaver@debian.org>  Sun, 20 Nov 2022 13:10:45 +0100
+
+libvncserver (0.9.13+dfsg-4) unstable; urgency=medium
+
+  * debian/patches:
+    + Trivially rebase patches 0001 and 0002.
+    + Add 0003-rfb-increase-update-buf-size.patch. Allow larger screen sizes.
+      (Closes: #1010449).
+  * debian/control:
+    + Bump Standards-Version: to 4.6.1. No changes needed.
+
+ -- Mike Gabriel <sunweaver@debian.org>  Fri, 03 Jun 2022 09:47:24 +0200
 
 libvncserver (0.9.13+dfsg-3) unstable; urgency=medium
 

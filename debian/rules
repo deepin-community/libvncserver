@@ -23,10 +23,5 @@ override_dh_auto_configure:
 	    -DCMAKE_BUILD_TYPE=RELWITHDEBINFO \
 	    $(NULL)
 
-
-override_dh_strip:
-	dh_strip -plibvncclient1 --dbgsym-migration='libvncclient1-dbg (<< 0.9.12-1~)'
-	dh_strip -plibvncserver1 --dbgsym-migration='libvncserver1-dbg (<< 0.9.12-1~)'
-
 get-orig-source:
 	uscan --noconf --force-download --rename --download-current-version --destdir=..
