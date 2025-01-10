@@ -471,6 +471,12 @@ typedef struct _rfbClient {
 	 * For internal use only.
 	 */
 	MUTEX(tlsRwMutex);
+
+	rfbBool requestedResize;
+        /**
+         * Used for intended dimensions, rfbClient.width and rfbClient.height are used to manage the real framebuffer dimensions.
+	 */
+	rfbExtDesktopScreen screen;
 } rfbClient;
 
 /* cursor.c */
@@ -561,6 +567,14 @@ extern rfbBool SendScaleSetting(rfbClient* client,int scaleSetting);
  */
 extern rfbBool SendPointerEvent(rfbClient* client,int x, int y, int buttonMask);
 /**
+ * Sends a SetDesktopSize event to the server.
+ * @param client The client through which to send the SetDesktopSize event
+ * @param width The width of the update request rectangle
+ * @param height The height of the update request rectangle
+ * @return true if the SetDesktopSize event was send successfully, false otherwise
+ */
+extern rfbBool SendExtDesktopSize(rfbClient* client, uint16_t width, uint16_t height);
+/**
  * Sends a key event to the server. If your application is not merely a VNC
  * viewer (i.e. it controls the server), you'll want to send the keys that the
  * user presses to the server. Use this function to do that.
@@ -570,6 +584,17 @@ extern rfbBool SendPointerEvent(rfbClient* client,int x, int y, int buttonMask);
  * @return true if the key event was send successfully, false otherwise
  */
 extern rfbBool SendKeyEvent(rfbClient* client,uint32_t key, rfbBool down);
+/**
+ * The same as SendKeyEvent, except a key code will be sent along with the
+ * symbol if the server supports extended key events.
+ * @param client The client through which to send the key event
+ * @param keysym An rfbKeySym defined in rfb/keysym.h
+ * @param keycode An XT key code
+ * @param down true if this was a key down event, false otherwise
+ * @return true if the extended key event is supported and was sent
+ * successfully, false otherwise
+ */
+extern rfbBool SendExtendedKeyEvent(rfbClient* client, uint32_t keysym, uint32_t keycode, rfbBool down);
 /**
  * Places a string on the server's clipboard. Use this function if you want to
  * be able to copy and paste between the server and your application. For

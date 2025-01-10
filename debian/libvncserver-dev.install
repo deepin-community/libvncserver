@@ -3,3 +3,4 @@ usr/lib/*/libvncclient.so
 usr/lib/*/libvncserver.so
 usr/lib/*/pkgconfig/libvncserver.pc
 usr/lib/*/pkgconfig/libvncclient.pc
+usr/lib/*/cmake/LibVNCServer/

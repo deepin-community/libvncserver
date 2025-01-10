@@ -4,11 +4,11 @@ libvncclient.so.1 libvncclient1 #MINVER#
  ClearClient2Server@Base 0.9.10
  ClearServer2Client@Base 0.9.10
  ConnectClientToTcpAddr6@Base 0.9.10
- ConnectClientToTcpAddr6WithTimeout@Base 0.9.13+dfsg
+ ConnectClientToTcpAddr6WithTimeout@Base 0.9.13
  ConnectClientToTcpAddr@Base 0.9.10
- ConnectClientToTcpAddrWithTimeout@Base 0.9.13+dfsg
+ ConnectClientToTcpAddrWithTimeout@Base 0.9.13
  ConnectClientToUnixSock@Base 0.9.10
- ConnectClientToUnixSockWithTimeout@Base 0.9.13+dfsg
+ ConnectClientToUnixSockWithTimeout@Base 0.9.13
  ConnectToRFBRepeater@Base 0.9.10
  ConnectToRFBServer@Base 0.9.10
  DefaultSupportedMessages@Base 0.9.10
@@ -33,13 +33,15 @@ libvncclient.so.1 libvncclient1 #MINVER#
  ReadFromTLS@Base 0.9.10
  SameMachine@Base 0.9.10
  SendClientCutText@Base 0.9.10
+ SendExtDesktopSize@Base 0.9.14
+ SendExtendedKeyEvent@Base 0.9.14
  SendFramebufferUpdateRequest@Base 0.9.10
  SendIncrementalFramebufferUpdateRequest@Base 0.9.10
  SendKeyEvent@Base 0.9.10
  SendPointerEvent@Base 0.9.10
  SendScaleSetting@Base 0.9.10
  SendXvpMsg@Base 0.9.10
- SetBlocking@Base 0.9.13+dfsg
+ SetBlocking@Base 0.9.13
  SetClient2Server@Base 0.9.10
  SetClientAuthSchemes@Base 0.9.10
  SetDSCP@Base 0.9.10
@@ -63,14 +65,14 @@ libvncclient.so.1 libvncclient1 #MINVER#
 #MISSING: 0.9.12# _lzo_config_check@Base 0.9.10
 #MISSING: 0.9.12# _lzo_version_date@Base 0.9.10
 #MISSING: 0.9.12# _lzo_version_string@Base 0.9.10
- decrypt_rfbdes@Base 0.9.13+dfsg
- dh_compute_shared_key@Base 0.9.13+dfsg
- dh_generate_keypair@Base 0.9.13+dfsg
- encrypt_aes128ecb@Base 0.9.13+dfsg
- encrypt_rfbdes@Base 0.9.13+dfsg
+ decrypt_rfbdes@Base 0.9.13
+ dh_compute_shared_key@Base 0.9.13
+ dh_generate_keypair@Base 0.9.13
+ encrypt_aes128ecb@Base 0.9.13
+ encrypt_rfbdes@Base 0.9.13
  errorMessageOnReadFailure@Base 0.9.10
- hash_md5@Base 0.9.13+dfsg
- hash_sha1@Base 0.9.13+dfsg
+ hash_md5@Base 0.9.13
+ hash_sha1@Base 0.9.13
  listenForIncomingConnections@Base 0.9.10
  listenForIncomingConnectionsNoFork@Base 0.9.10
 #MISSING: 0.9.12# lzo1x_1_compress@Base 0.9.10
@@ -85,11 +87,11 @@ libvncclient.so.1 libvncclient1 #MINVER#
 #MISSING: 0.9.12# lzo_version@Base 0.9.10
 #MISSING: 0.9.12# lzo_version_date@Base 0.9.10
 #MISSING: 0.9.12# lzo_version_string@Base 0.9.10
- random_bytes@Base 0.9.13+dfsg
+ random_bytes@Base 0.9.13
 #MISSING: 0.9.12# rfbClientCPKey@Base 0.9.10
  rfbClientCleanup@Base 0.9.10
-#MISSING: 0.9.13+dfsg# rfbClientDes@Base 0.9.10
-#MISSING: 0.9.13+dfsg# rfbClientDesKey@Base 0.9.10
+#MISSING: 0.9.13# rfbClientDes@Base 0.9.10
+#MISSING: 0.9.13# rfbClientDesKey@Base 0.9.10
  rfbClientEncryptBytes2@Base 0.9.10
  rfbClientEncryptBytes@Base 0.9.10
  rfbClientErr@Base 0.9.10
@@ -98,11 +100,13 @@ libvncclient.so.1 libvncclient1 #MINVER#
  rfbClientLog@Base 0.9.10
  rfbClientRegisterExtension@Base 0.9.10
  rfbClientSetClientData@Base 0.9.10
-#MISSING: 0.9.13+dfsg# rfbClientUseKey@Base 0.9.10
+#MISSING: 0.9.13# rfbClientUseKey@Base 0.9.10
  rfbEnableClientLogging@Base 0.9.10
  rfbGetClient@Base 0.9.10
  rfbHandleAuthResult@Base 0.9.10
  rfbInitClient@Base 0.9.10
+ sock_set_nonblocking@Base 0.9.14
+ sock_wait_for_connected@Base 0.9.14
  tjBufSize@Base 0.9.12
  tjCompress2@Base 0.9.12
  tjCompress@Base 0.9.12

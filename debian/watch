@@ -1,3 +1,4 @@
 version=4
-opts=repacksuffix=+dfsg,dversionmangle=s/\+dfsg// \
-https://github.com/LibVNC/libvncserver/releases .*/archive/refs/tags/LibVNCServer-(\d\S+)\.tar\.gz
+opts=repacksuffix=+dfsg,\
+     dversionmangle=s/\+dfsg// \
+     https://github.com/LibVNC/libvncserver/tags .*/LibVNCServer-(\d\S+)\.tar\.gz
