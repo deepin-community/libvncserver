@@ -1,3 +1,9 @@
+libvncserver (0.9.14+dfsg-1deepin2) unstable; urgency=medium
+
+  * Fix CVE-2026-44988: out-of-bounds write in Tight gradient decoder
+
+ -- deepin-ci-robot <packages@deepin.org>  Thu, 04 Jun 2026 17:30:00 +0800
+
 libvncserver (0.9.14+dfsg-1deepin1) unstable; urgency=medium
 
   * Fix CVE-2026-32853: heap out-of-bounds read in UltraZip encoding
