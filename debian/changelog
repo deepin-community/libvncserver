@@ -1,3 +1,10 @@
+libvncserver (0.9.15+dfsg-1+deb13u1deepin1) unstable; urgency=medium
+
+  * Restore deepin-specific patches:
+    + CVE-2026-44988: Fix Tight gradient decoding overflow (out-of-bounds write).
+
+ -- lichenggang <lichenggang@uniontech.com>  Fri, 17 Jul 2026 23:30:00 +0800
+
 libvncserver (0.9.15+dfsg-1+deb13u1) trixie; urgency=medium
 
   * Team upload.
