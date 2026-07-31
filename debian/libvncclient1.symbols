@@ -33,6 +33,7 @@ libvncclient.so.1 libvncclient1 #MINVER#
  ReadFromTLS@Base 0.9.10
  SameMachine@Base 0.9.10
  SendClientCutText@Base 0.9.10
+ SendClientCutTextUTF8@Base 0.9.15
  SendExtDesktopSize@Base 0.9.14
  SendExtendedKeyEvent@Base 0.9.14
  SendFramebufferUpdateRequest@Base 0.9.10
@@ -97,9 +98,11 @@ libvncclient.so.1 libvncclient1 #MINVER#
  rfbClientErr@Base 0.9.10
  rfbClientExtensions@Base 0.9.10
  rfbClientGetClientData@Base 0.9.10
+ rfbClientGetUpdateRect@Base 0.9.15
  rfbClientLog@Base 0.9.10
  rfbClientRegisterExtension@Base 0.9.10
  rfbClientSetClientData@Base 0.9.10
+ rfbClientSetUpdateRect@Base 0.9.15
 #MISSING: 0.9.13# rfbClientUseKey@Base 0.9.10
  rfbEnableClientLogging@Base 0.9.10
  rfbGetClient@Base 0.9.10

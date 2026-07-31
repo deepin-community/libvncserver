@@ -1,21 +1,27 @@
-libvncserver (0.9.14+dfsg-1deepin3) unstable; urgency=medium
+libvncserver (0.9.15+dfsg-1+deb13u1) trixie; urgency=medium
 
-  * fix(cve): CVE-2026-50538
+  * Team upload.
+  * debian/patches:
+    + CVE-2026-32853: Add 0001_CVE-2026-32853.patch fixing a heap out-of-bounds
+      read (Closes: #1132016).
+    + CVE-2026-32854: Add 0002_CVE-2026-32854.patch fixing NULL pointer
+      dereferences in httpd proxy handlers (Closes: #1132017).
 
- -- deepin-ci-robot <packages@deepin.org>  Thu, 16 Jul 2026 23:24:52 +0800
+ -- Sven Geuer <sge@debian.org>  Mon, 06 Apr 2026 22:55:25 +0200
 
-libvncserver (0.9.14+dfsg-1deepin2) unstable; urgency=medium
+libvncserver (0.9.15+dfsg-1) unstable; urgency=medium
 
-  * Fix CVE-2026-44988: out-of-bounds write in Tight gradient decoder
+  * New upstream release.
+  * debian/control:
+    + Bump Standards-Version: to 4.7.2. No changes needed.
+    + In B-D, switch from pkg-config to pkgconf.
+  * debian/libvncclient1.symbols:
+    + Update symbols.
+  * debian/copyright:
+    + Auto-generate copyright.in file for better copyright changes tracking.
+    + Entirely rewrite copyright attributions.
 
- -- deepin-ci-robot <packages@deepin.org>  Thu, 04 Jun 2026 17:30:00 +0800
-
-libvncserver (0.9.14+dfsg-1deepin1) unstable; urgency=medium
-
-  * Fix CVE-2026-32853: heap out-of-bounds read in UltraZip encoding
-  * Fix CVE-2026-32854: null pointer dereference in HTTP proxy handlers
-
- -- deepin-ci-robot <packages@deepin.org>  Thu, 07 May 2026 22:07:34 +0800
+ -- Mike Gabriel <sunweaver@debian.org>  Thu, 10 Apr 2025 12:51:42 +0200
 
 libvncserver (0.9.14+dfsg-1) unstable; urgency=medium
 
