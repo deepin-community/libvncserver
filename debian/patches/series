@@ -1,2 +1,3 @@
 0001_CVE-2026-32853.patch
 0002_CVE-2026-32854.patch
+0003_fix-utf8-clipboard-text.patch

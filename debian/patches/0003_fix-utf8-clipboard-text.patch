@@ -1,0 +1,241 @@
+Description: Fix garbled clipboard text when VNC clients send UTF-8 via basic ClientCutText
+ When a VNC client sends clipboard text via the basic ClientCutText message
+ (used by TightVNC, UltraVNC, and many other clients that lack Extended
+ Clipboard support), the server always called setXCutText (the Latin-1 handler)
+ without checking the actual text encoding. Clients that send UTF-8 encoded
+ Chinese text through this basic path have their multi-byte UTF-8 sequences
+ split into individual Latin-1 characters, producing garbled text on the
+ server side.
+ .
+ This fix adds two changes:
+ 1. UTF-8 detection in the basic ClientCutText path (rfbserver.c):
+    When setXCutTextUTF8 callback is available, validate the received text
+    as UTF-8. If valid, route to setXCutTextUTF8 instead of setXCutText.
+    ASCII text (also valid Latin-1) is unaffected. Non-UTF-8 Latin-1 text
+    correctly falls back to setXCutText.
+ 2. Default setXCutTextUTF8 callback on UTF-8 systems (main.c):
+    When the system locale uses UTF-8 encoding (detected via
+    nl_langinfo(CODESET)), install rfbDefaultSetXCutTextUTF8 as the default
+    callback instead of NULL. This default delegates to setXCutText, enabling
+    Extended Clipboard negotiation and basic-path UTF-8 detection without
+    requiring the application to explicitly set the callback.
+Forwarded: https://github.com/deepin-community/libvncserver/pull/8
+Last-Update: 2026-09-09
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 205f392..12e5204 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -210,6 +210,9 @@ check_include_file("sys/types.h"   LIBVNCSERVER_HAVE_SYS_TYPES_H)
+ check_include_file("sys/wait.h"    LIBVNCSERVER_HAVE_SYS_WAIT_H)
+ check_include_file("unistd.h"      LIBVNCSERVER_HAVE_UNISTD_H)
+ check_include_file("sys/resource.h"     LIBVNCSERVER_HAVE_SYS_RESOURCE_H)
++check_include_file("langinfo.h"    LIBVNCSERVER_HAVE_LANGINFO_H)
++check_include_file("locale.h"      LIBVNCSERVER_HAVE_LOCALE_H)
++check_include_file("strings.h"     LIBVNCSERVER_HAVE_STRINGS_H)
+ 
+ 
+ # headers needed for check_type_size()
+diff --git a/include/rfb/rfbconfig.h.cmakein b/include/rfb/rfbconfig.h.cmakein
+index d50c3c9..578dfbf 100644
+--- a/include/rfb/rfbconfig.h.cmakein
++++ b/include/rfb/rfbconfig.h.cmakein
+@@ -22,7 +22,16 @@
+ #cmakedefine LIBVNCSERVER_HAVE_GETTIMEOFDAY  1 
+ 
+ /* Define to 1 if you have the `ftime' function. */
+-#cmakedefine LIBVNCSERVER_HAVE_FTIME  1 
++#cmakedefine LIBVNCSERVER_HAVE_FTIME  1
++
++/* Define to 1 if you have the <langinfo.h> header file. */
++#cmakedefine LIBVNCSERVER_HAVE_LANGINFO_H 1
++
++/* Define to 1 if you have the <locale.h> header file. */
++#cmakedefine LIBVNCSERVER_HAVE_LOCALE_H 1
++
++/* Define to 1 if you have the <strings.h> header file. */
++#cmakedefine LIBVNCSERVER_HAVE_STRINGS_H 1 
+ 
+ /* Define to 1 if you have the `gethostbyname' function. */
+ #cmakedefine LIBVNCSERVER_HAVE_GETHOSTBYNAME  1 
+diff --git a/src/libvncserver/main.c b/src/libvncserver/main.c
+index 9e4bd3c..a4e48a1 100644
+--- a/src/libvncserver/main.c
++++ b/src/libvncserver/main.c
+@@ -19,6 +19,9 @@
+ 
+ #include <stdarg.h>
+ #include <errno.h>
++#ifdef LIBVNCSERVER_HAVE_STRINGS_H
++#include <strings.h>
++#endif
+ 
+ #ifndef false
+ #define false 0
+@@ -40,6 +43,13 @@
+ #include <signal.h>
+ #include <time.h>
+ 
++#ifdef LIBVNCSERVER_HAVE_LANGINFO_H
++#include <langinfo.h>
++#endif
++#ifdef LIBVNCSERVER_HAVE_LOCALE_H
++#include <locale.h>
++#endif
++
+ static int extMutex_initialized = 0;
+ static int logMutex_initialized = 0;
+ #if defined(LIBVNCSERVER_HAVE_LIBPTHREAD) || defined(LIBVNCSERVER_HAVE_WIN32THREADS)
+@@ -753,6 +763,22 @@ static void rfbDefaultSetXCutText(char* text, int len, rfbClientPtr cl)
+ {
+ }
+ 
++/*
++ * rfbDefaultSetXCutTextUTF8() - Default handler for UTF-8 cut text.
++ *
++ * When the system locale uses UTF-8 encoding, this default callback is
++ * installed so that the Extended Clipboard extension can be negotiated
++ * and the basic ClientCutText UTF-8 detection path can route valid UTF-8
++ * text through this handler.  It simply delegates to setXCutText, because
++ * on a UTF-8 system the application's Latin-1 handler (or the no-op
++ * default) already receives the raw bytes correctly.
++ */
++static void rfbDefaultSetXCutTextUTF8(char* text, int len, rfbClientPtr cl)
++{
++    if (cl && cl->screen && cl->screen->setXCutText)
++        cl->screen->setXCutText(text, len, cl);
++}
++
+ /* TODO: add a nice VNC or RFB cursor */
+ 
+ #if defined(WIN32) || defined(sparc) || !defined(NO_STRICT_ANSI)
+@@ -1041,7 +1067,29 @@ rfbScreenInfoPtr rfbGetScreen(int* argc,char** argv,
+    screen->ptrAddEvent = rfbDefaultPtrAddEvent;
+    screen->setXCutText = rfbDefaultSetXCutText;
+ #ifdef LIBVNCSERVER_HAVE_LIBZ
+-   screen->setXCutTextUTF8 = NULL;
++   /* If the system locale uses UTF-8, provide a default UTF-8 cut-text
++    * handler so that Extended Clipboard negotiation and basic-path UTF-8
++    * detection are effective without requiring the application to set
++    * the callback explicitly. */
++   {
++       rfbBool systemIsUTF8 = FALSE;
++#if defined(LIBVNCSERVER_HAVE_LANGINFO_H) && defined(LIBVNCSERVER_HAVE_LOCALE_H)
++       char *orig_locale = setlocale(LC_CTYPE, NULL);
++       char *saved_locale = orig_locale ? strdup(orig_locale) : NULL;
++       if (saved_locale != NULL) {
++           setlocale(LC_CTYPE, "");
++           const char *codeset = nl_langinfo(CODESET);
++           if (codeset != NULL &&
++               (strcasecmp(codeset, "UTF-8") == 0 ||
++                strcasecmp(codeset, "UTF8") == 0))
++               systemIsUTF8 = TRUE;
++           /* Restore original locale */
++           setlocale(LC_CTYPE, saved_locale);
++           free(saved_locale);
++       }
++#endif
++       screen->setXCutTextUTF8 = systemIsUTF8 ? rfbDefaultSetXCutTextUTF8 : NULL;
++   }
+ #endif
+    screen->getCursorPtr = rfbDefaultGetCursorPtr;
+    screen->setTranslateFunction = rfbSetTranslateFunction;
+diff --git a/src/libvncserver/rfbserver.c b/src/libvncserver/rfbserver.c
+index 8e3c3f6..c936b05 100644
+--- a/src/libvncserver/rfbserver.c
++++ b/src/libvncserver/rfbserver.c
+@@ -100,6 +100,79 @@
+ #endif
+ #endif
+ 
++
++/*
++ * rfbIsValidUTF8() - Check whether the given byte sequence is valid UTF-8.
++ *
++ * Returns TRUE if the data is valid UTF-8, FALSE otherwise.
++ * ASCII (0x00-0x7F) is always valid UTF-8, so pure-ASCII text passes.
++ * Most Latin-1 text with bytes > 0x7F is NOT valid UTF-8 due to strict
++ * multi-byte sequence rules, so it correctly fails and falls back to
++ * the Latin-1 handler.
++ */
++static rfbBool
++rfbIsValidUTF8(const char *str, int len)
++{
++    int i = 0;
++    const unsigned char *s = (const unsigned char *)str;
++
++    if (str == NULL || len <= 0)
++        return TRUE;
++
++    while (i < len) {
++        unsigned char c = s[i];
++        int seq_len, j;
++
++        if (c <= 0x7F) {
++            /* ASCII byte */
++            i++;
++            continue;
++        }
++
++        /* Determine expected sequence length from leading byte */
++        if ((c & 0xE0) == 0xC0)
++            seq_len = 2;
++        else if ((c & 0xF0) == 0xE0)
++            seq_len = 3;
++        else if ((c & 0xF8) == 0xF0)
++            seq_len = 4;
++        else
++            return FALSE; /* Invalid leading byte */
++
++        /* Check that we have enough continuation bytes */
++        if (i + seq_len > len)
++            return FALSE;
++
++        /* Validate continuation bytes (must be 10xxxxxx) */
++        for (j = 1; j < seq_len; j++) {
++            if ((s[i + j] & 0xC0) != 0x80)
++                return FALSE;
++        }
++
++        /* Check for overlong encodings and invalid code points */
++        if (seq_len == 2) {
++            if (c < 0xC2)
++                return FALSE; /* Overlong */
++        } else if (seq_len == 3) {
++            unsigned char c2 = s[i + 1];
++            if (c == 0xE0 && c2 < 0xA0)
++                return FALSE; /* Overlong */
++            if (c == 0xED && c2 > 0x9F)
++                return FALSE; /* Surrogate (U+D800..U+DFFF) */
++        } else if (seq_len == 4) {
++            unsigned char c2 = s[i + 1];
++            if (c == 0xF0 && c2 < 0x90)
++                return FALSE; /* Overlong */
++            if (c > 0xF4)
++                return FALSE; /* Above U+10FFFF */
++        }
++
++        i += seq_len;
++    }
++
++    return TRUE;
++}
++
+ #ifdef LIBVNCSERVER_HAVE_LIBJPEG
+ /*
+  * Map of quality levels to provide compatibility with TightVNC/TigerVNC
+@@ -2931,7 +3004,12 @@ rfbProcessClientNormalMessage(rfbClientPtr cl)
+         free(str);
+     } else {
+         if(!cl->viewOnly) {
+-            cl->screen->setXCutText(str, msg.cct.length, cl);
++            if (cl->screen->setXCutTextUTF8 &&
++                rfbIsValidUTF8(str, msg.cct.length)) {
++                cl->screen->setXCutTextUTF8(str, msg.cct.length, cl);
++            } else {
++                cl->screen->setXCutText(str, msg.cct.length, cl);
++            }
+         }
+         free(str);
+     }
