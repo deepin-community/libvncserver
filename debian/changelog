@@ -1,3 +1,14 @@
+libvncserver (0.9.15+dfsg-1+deb13u2) trixie; urgency=medium
+
+  * Team upload.
+  * debian/patches:
+    + CVE-2026-44988: Add 0003_CVE-2026-44988.patch fixing Tight gradient
+      decoding overflow (Closes: #1138174).
+    + CVE-2026-50538: Add 0004_CVE-2026-50538.patch fixing attacker-controlled
+      heap out-of-bounds write (Closes: #1138253).
+
+ -- Sven Geuer <sge@debian.org>  Wed, 17 Jun 2026 12:21:21 +0200
+
 libvncserver (0.9.15+dfsg-1+deb13u1) trixie; urgency=medium
 
   * Team upload.
