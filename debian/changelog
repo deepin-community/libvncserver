@@ -1,3 +1,14 @@
+libvncserver (0.9.15+dfsg-1+deb13u1deepin1) deepin; urgency=medium
+
+  * fix: handle UTF-8 text in basic ClientCutText path to fix clipboard
+    garbled text.
+  * debian/patches:
+    + Add 0003_fix-utf8-clipboard-text.patch: detect UTF-8 encoding in basic
+      ClientCutText path and route to setXCutTextUTF8 when valid; install
+      default setXCutTextUTF8 callback on UTF-8 systems.
+
+ -- liyigang <liyigang1@uniontech.com>  Tue, 09 Sep 2026 10:55:00 +0800
+
 libvncserver (0.9.15+dfsg-1+deb13u1) trixie; urgency=medium
 
   * Team upload.
